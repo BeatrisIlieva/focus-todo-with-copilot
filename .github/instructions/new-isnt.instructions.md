@@ -100,87 +100,88 @@ A progress bar that shows the progress
 </progress_tracking>
 </features>
 
-<project_setup>
-You should wait a confirmation before proceeding to the next step.
-<task>Create project folder structure:
-<folder>/src (source code)
-<subfolder>/js (JavaScript modules)</subfolder>
-<subfolder>/css (styles)</subfolder>
-<subfolder>/assets (icons, images)</subfolder>
-</folder>
-<folder>/tests (unit tests)</folder>
-<file>index.html</file>
-<file>README.md</file>
-</task>
-<task>Initialize Git repository and add .gitignore</task>
-<task>Set up Prettier and ESLint for code quality</task>
-</project_setup>
+<execution_plan>
+  <project_setup>
+  <task>Create project folder structure:
+  <folder>/src (source code)
+  <subfolder>/js (JavaScript modules)</subfolder>
+  <subfolder>/css (styles)</subfolder>
+  <subfolder>/assets (icons, images)</subfolder>
+  </folder>
+  <folder>/tests (unit tests)</folder>
+  <file>index.html</file>
+  <file>README.md</file>
+  </task>
+  <task>Initialize Git repository and add .gitignore</task>
+  <task>Set up Prettier and ESLint for code quality</task>
+  </project_setup>
 
-<html_structure_base_layout>
-<task>Build semantic HTML skeleton in index.html</task>
-<task>Add main containers for:
-<container>Header (logo, navigation)</container>
-<container>Pomodoro timer</container>
-<container>Task list</container>
-<container>Progress bar</container>
-<container>Modals/popups (for editing/creating tasks)</container>
-</task>
-<task>Ensure accessibility (ARIA, keyboard navigation)</task>
-</html_structure_base_layout>
+  <html_structure_base_layout>
+  <task>Build semantic HTML skeleton in index.html</task>
+  <task>Add main containers for:
+  <container>Header (logo, navigation)</container>
+  <container>Pomodoro timer</container>
+  <container>Task list</container>
+  <container>Progress bar</container>
+  <container>Modals/popups (for editing/creating tasks)</container>
+  </task>
+  <task>Ensure accessibility (ARIA, keyboard navigation)</task>
+  </html_structure_base_layout>
 
-<styling_design>
-<task>Create base CSS (/css/style.css)</task>
-<task>Implement layout using Flexbox/Grid</task>
-<task>Match original Focus To-Do design (colors, spacing, typography)</task>
-<task>Add responsive breakpoints for mobile/tablet</task>
-</styling_design>
+  <styling_design>
+  <task>Create base CSS (/css/style.css)</task>
+  <task>Implement layout using Flexbox/Grid</task>
+  <task>Match original Focus To-Do design (colors, spacing, typography)</task>
+  <task>Add responsive breakpoints for mobile/tablet</task>
+  </styling_design>
 
-<pomodoro_timer_module>
-<task>Create /js/timer.js</task>
-<task>Implement timer logic (start, pause, reset, session/break switching)</task>
-<task>Add customizable durations</task>
-<task>UI updates and sound/notification support</task>
-</pomodoro_timer_module>
+  <pomodoro_timer_module>
+  <task>Create /js/timer.js</task>
+  <task>Implement timer logic (start, pause, reset, session/break switching)</task>
+  <task>Add customizable durations</task>
+  <task>UI updates and sound/notification support</task>
+  </pomodoro_timer_module>
 
-<task_management_module>
-<task>Create /js/tasks.js</task>
-<task>CRUD operations: add, edit, delete tasks</task>
-<task>Subtasks/checklists support</task>
-<task>Organize by project/tag/priority</task>
-<task>Drag-and-drop ordering (using HTML5 Drag & Drop API)</task>
-<task>Recurring tasks logic</task>
-</task_management_module>
+  <task_management_module>
+  <task>Create /js/tasks.js</task>
+  <task>CRUD operations: add, edit, delete tasks</task>
+  <task>Subtasks/checklists support</task>
+  <task>Organize by project/tag/priority</task>
+  <task>Drag-and-drop ordering (using HTML5 Drag & Drop API)</task>
+  <task>Recurring tasks logic</task>
+  </task_management_module>
 
-<progress_tracking_module>
-<task>Create /js/progress.js</task>
-<task>Calculate and display progress bar based on completed tasks/Pomodoros</task>
-<task>Store and show historical stats (optional)</task>
-</progress_tracking_module>
+  <progress_tracking_module>
+  <task>Create /js/progress.js</task>
+  <task>Calculate and display progress bar based on completed tasks/Pomodoros</task>
+  <task>Store and show historical stats (optional)</task>
+  </progress_tracking_module>
 
-<state_management_persistence>
-<task>Create /js/storage.js</task>
-<task>Use LocalStorage for saving tasks, timer state, and progress</task>
-<task>Load state on app start</task>
-</state_management_persistence>
+  <state_management_persistence>
+  <task>Create /js/storage.js</task>
+  <task>Use LocalStorage for saving tasks, timer state, and progress</task>
+  <task>Load state on app start</task>
+  </state_management_persistence>
 
-<ui_interactions_accessibility>
-<task>Keyboard navigation for all interactive elements</task>
-<task>ARIA attributes for screen readers</task>
-<task>Focus management for modals and forms</task>
-</ui_interactions_accessibility>
+  <ui_interactions_accessibility>
+  <task>Keyboard navigation for all interactive elements</task>
+  <task>ARIA attributes for screen readers</task>
+  <task>Focus management for modals and forms</task>
+  </ui_interactions_accessibility>
 
-<testing>
-  <task>Set up basic unit tests for core logic (timer, tasks, storage)</task>
-  <task>Place tests in /tests folder</task>
-</testing>
+  <testing>
+    <task>Set up basic unit tests for core logic (timer, tasks, storage)</task>
+    <task>Place tests in /tests folder</task>
+  </testing>
 
-<polish_documentation>
-<task>Refactor code for readability and SOLID principles</task>
-<task>Add JSDoc comments and inline documentation</task>
-<task>Write README.md with setup and usage instructions</task>
-</polish_documentation>
+  <polish_documentation>
+  <task>Refactor code for readability and SOLID principles</task>
+  <task>Add JSDoc comments and inline documentation</task>
+  <task>Write README.md with setup and usage instructions</task>
+  </polish_documentation>
 
-<deployment>
-  <task>Prepare for deployment (optimize assets, minify CSS/JS)</task>
-  <task>Deploy to GitHub Pages</task>
-</deployment>
+  <deployment>
+    <task>Prepare for deployment (optimize assets, minify CSS/JS)</task>
+    <task>Deploy to GitHub Pages</task>
+  </deployment>
+</execution_plan>

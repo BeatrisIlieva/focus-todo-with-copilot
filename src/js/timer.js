@@ -1,213 +1,201 @@
 /**
- * timer.js
- * Module for handling the Pomodoro timer functionality
+ * Pomodoro Timer Module
+ * Handles the Pomodoro timer functionality
  */
 
-/**
- * Timer states
- * @enum {string}
- */
-const TimerState = {
-  IDLE: 'idle',
-  RUNNING: 'running',
-  PAUSED: 'paused',
-  BREAK: 'break'
-};
+import { saveState } from './storage.js';
 
-/**
- * Timer settings
- * @typedef {Object} TimerSettings
- * @property {number} focusDuration - Focus duration in minutes
- * @property {number} shortBreakDuration - Short break duration in minutes
- * @property {number} longBreakDuration - Long break duration in minutes
- * @property {number} longBreakInterval - Number of pomodoros before a long break
- * @property {boolean} autoStartBreaks - Whether to automatically start breaks
- * @property {boolean} autoStartPomodoros - Whether to automatically start pomodoros
- */
-
-/**
- * Default timer settings
- * @type {TimerSettings}
- */
+// Default timer settings
 const DEFAULT_SETTINGS = {
-  focusDuration: 25,
-  shortBreakDuration: 5,
-  longBreakDuration: 15,
-  longBreakInterval: 4,
-  autoStartBreaks: false,
-  autoStartPomodoros: false
+    pomodoro: 25 * 60, // 25 minutes in seconds
+    shortBreak: 5 * 60, // 5 minutes in seconds
+    longBreak: 15 * 60, // 15 minutes in seconds
+    longBreakInterval: 4, // After 4 pomodoros, take a long break
 };
 
+// Timer state
+let timerState = {
+    currentMode: 'pomodoro', // 'pomodoro', 'shortBreak', or 'longBreak'
+    timeRemaining: DEFAULT_SETTINGS.pomodoro, // Time remaining in seconds
+    isRunning: false,
+    currentTask: null, // The task currently being worked on
+    completedPomodoros: 0, // Number of completed pomodoros
+};
+
+let timerInterval = null;
+
 /**
- * PomodoroTimer class for managing pomodoro timing functionality
+ * Initialize the Pomodoro timer module
  */
-class PomodoroTimer {
-  /**
-   * Creates a new PomodoroTimer instance
-   * @param {Object} options - Configuration options
-   * @param {Function} options.onTick - Callback for timer ticks (seconds)
-   * @param {Function} options.onStateChange - Callback for state changes
-   * @param {Function} options.onComplete - Callback for timer completion
-   */
-  constructor(options = {}) {
-    this.settings = { ...DEFAULT_SETTINGS };
-    this.state = TimerState.IDLE;
-    this.timeRemaining = this.settings.focusDuration * 60;
-    this.intervalId = null;
-    this.completedPomodoros = 0;
+export function initPomodoroTimer() {
+    // Set up event listeners for timer controls
+    setupTimerEventListeners();
     
-    // Callbacks
-    this.onTick = options.onTick || (() => {});
-    this.onStateChange = options.onStateChange || (() => {});
-    this.onComplete = options.onComplete || (() => {});
-  }
-
-  /**
-   * Updates timer settings
-   * @param {TimerSettings} newSettings - New timer settings
-   */
-  updateSettings(newSettings) {
-    this.settings = { ...this.settings, ...newSettings };
-    
-    // If in idle state, update the time remaining based on new focus duration
-    if (this.state === TimerState.IDLE) {
-      this.timeRemaining = this.settings.focusDuration * 60;
-      this.onTick(this.timeRemaining);
-    }
-  }
-
-  /**
-   * Starts the timer
-   */
-  start() {
-    if (this.state === TimerState.RUNNING) return;
-    
-    this.state = TimerState.RUNNING;
-    this.intervalId = setInterval(() => this._tick(), 1000);
-    this.onStateChange(this.state);
-  }
-
-  /**
-   * Pauses the timer
-   */
-  pause() {
-    if (this.state !== TimerState.RUNNING) return;
-    
-    this.state = TimerState.PAUSED;
-    clearInterval(this.intervalId);
-    this.onStateChange(this.state);
-  }
-
-  /**
-   * Resets the timer to initial state
-   */
-  reset() {
-    clearInterval(this.intervalId);
-    this.state = TimerState.IDLE;
-    this.timeRemaining = this.settings.focusDuration * 60;
-    this.onStateChange(this.state);
-    this.onTick(this.timeRemaining);
-  }
-
-  /**
-   * Skips the current timer and moves to the next state
-   */
-  skip() {
-    this._handleTimerComplete();
-  }
-
-  /**
-   * Internal method to handle timer ticks
-   * @private
-   */
-  _tick() {
-    if (this.timeRemaining > 0) {
-      this.timeRemaining--;
-      this.onTick(this.timeRemaining);
-    } else {
-      this._handleTimerComplete();
-    }
-  }
-
-  /**
-   * Internal method to handle timer completion
-   * @private
-   */
-  _handleTimerComplete() {
-    clearInterval(this.intervalId);
-    
-    if (this.state === TimerState.RUNNING && this.isInFocusMode()) {
-      // Completed a pomodoro
-      this.completedPomodoros++;
-      const isLongBreak = this.completedPomodoros % this.settings.longBreakInterval === 0;
-      
-      this.state = TimerState.BREAK;
-      this.timeRemaining = isLongBreak 
-        ? this.settings.longBreakDuration * 60 
-        : this.settings.shortBreakDuration * 60;
-      
-      this.onComplete({
-        type: 'focus',
-        duration: this.settings.focusDuration,
-        completedPomodoros: this.completedPomodoros
-      });
-      
-      if (this.settings.autoStartBreaks) {
-        this.start();
-      } else {
-        this.onStateChange(this.state);
-        this.onTick(this.timeRemaining);
-      }
-    } else if (this.state === TimerState.RUNNING && !this.isInFocusMode()) {
-      // Completed a break
-      this.state = TimerState.IDLE;
-      this.timeRemaining = this.settings.focusDuration * 60;
-      
-      this.onComplete({
-        type: 'break',
-        duration: this.isLongBreak() 
-          ? this.settings.longBreakDuration 
-          : this.settings.shortBreakDuration
-      });
-      
-      if (this.settings.autoStartPomodoros) {
-        this.start();
-      } else {
-        this.onStateChange(this.state);
-        this.onTick(this.timeRemaining);
-      }
-    }
-  }
-
-  /**
-   * Checks if the timer is in focus mode
-   * @returns {boolean} True if in focus mode, false if in break mode
-   */
-  isInFocusMode() {
-    return this.state !== TimerState.BREAK;
-  }
-
-  /**
-   * Checks if the current break is a long break
-   * @returns {boolean} True if it's a long break, false otherwise
-   */
-  isLongBreak() {
-    return this.completedPomodoros % this.settings.longBreakInterval === 0;
-  }
-
-  /**
-   * Gets the current timer status
-   * @returns {Object} Timer status object
-   */
-  getStatus() {
-    return {
-      state: this.state,
-      timeRemaining: this.timeRemaining,
-      completedPomodoros: this.completedPomodoros,
-      isInFocusMode: this.isInFocusMode(),
-      isLongBreak: this.isLongBreak()
-    };
-  }
+    // Update the timer display initially
+    updateTimerDisplay();
 }
 
-export { PomodoroTimer, TimerState, DEFAULT_SETTINGS };
+/**
+ * Set up event listeners for timer-related UI elements
+ */
+function setupTimerEventListeners() {
+    // Timer play/pause button
+    const timerButton = document.querySelector('.timer-control-btn');
+    timerButton.addEventListener('click', toggleTimer);
+    
+    // Other timer controls would be set up here
+}
+
+/**
+ * Toggle the timer between running and paused states
+ */
+function toggleTimer() {
+    if (timerState.isRunning) {
+        pauseTimer();
+    } else {
+        startTimer();
+    }
+}
+
+/**
+ * Start the timer
+ */
+function startTimer() {
+    timerState.isRunning = true;
+    
+    // Update the UI to show the timer is running
+    const timerButton = document.querySelector('.timer-control-btn');
+    timerButton.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    
+    // Start the interval timer
+    timerInterval = setInterval(tickTimer, 1000);
+    
+    saveState({ timerState });
+}
+
+/**
+ * Pause the timer
+ */
+function pauseTimer() {
+    timerState.isRunning = false;
+    
+    // Update the UI to show the timer is paused
+    const timerButton = document.querySelector('.timer-control-btn');
+    timerButton.innerHTML = '<i class="fa-solid fa-play"></i>';
+    
+    // Clear the interval timer
+    clearInterval(timerInterval);
+    
+    saveState({ timerState });
+}
+
+/**
+ * Reset the timer to its initial state
+ */
+function resetTimer() {
+    // Stop the timer if it's running
+    if (timerState.isRunning) {
+        pauseTimer();
+    }
+    
+    // Reset the timer state according to the current mode
+    timerState.timeRemaining = DEFAULT_SETTINGS[timerState.currentMode];
+    
+    // Update the display
+    updateTimerDisplay();
+    
+    saveState({ timerState });
+}
+
+/**
+ * Process a single timer tick (1 second)
+ */
+function tickTimer() {
+    if (timerState.timeRemaining > 0) {
+        // Decrement the time remaining
+        timerState.timeRemaining--;
+        
+        // Update the display
+        updateTimerDisplay();
+    } else {
+        // Timer has finished
+        completeTimer();
+    }
+}
+
+/**
+ * Handle timer completion
+ */
+function completeTimer() {
+    // Play a notification sound
+    playTimerCompleteSound();
+    
+    // Stop the timer
+    pauseTimer();
+    
+    if (timerState.currentMode === 'pomodoro') {
+        // Increment completed pomodoros
+        timerState.completedPomodoros++;
+        
+        // Update the task's pomodoro count if there is a current task
+        if (timerState.currentTask) {
+            // This would typically update the task's pomodoro count
+            // For now, just log it
+            console.log(`Task ${timerState.currentTask} completed a pomodoro`);
+        }
+        
+        // Determine which break to take
+        if (timerState.completedPomodoros % DEFAULT_SETTINGS.longBreakInterval === 0) {
+            switchTimerMode('longBreak');
+        } else {
+            switchTimerMode('shortBreak');
+        }
+    } else {
+        // If we were on a break, switch back to pomodoro
+        switchTimerMode('pomodoro');
+    }
+    
+    saveState({ timerState });
+}
+
+/**
+ * Switch the timer mode
+ * @param {string} mode - The timer mode to switch to ('pomodoro', 'shortBreak', or 'longBreak')
+ */
+function switchTimerMode(mode) {
+    timerState.currentMode = mode;
+    timerState.timeRemaining = DEFAULT_SETTINGS[mode];
+    
+    updateTimerDisplay();
+}
+
+/**
+ * Update the timer display in the UI
+ */
+function updateTimerDisplay() {
+    const minutes = Math.floor(timerState.timeRemaining / 60);
+    const seconds = timerState.timeRemaining % 60;
+    
+    // Format the time as MM:SS
+    const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Update the UI
+    document.querySelector('.timer-display').textContent = timeString;
+}
+
+/**
+ * Play a sound when the timer completes
+ */
+function playTimerCompleteSound() {
+    // This would play a sound in a real implementation
+    console.log('Timer complete sound played');
+}
+
+/**
+ * Set the current task for the timer
+ * @param {string} taskId - The ID of the task to set for the timer
+ */
+export function setTimerTask(taskId) {
+    timerState.currentTask = taskId;
+    saveState({ timerState });
+}

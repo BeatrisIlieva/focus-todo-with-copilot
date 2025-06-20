@@ -1,251 +1,97 @@
 /**
- * storage.js
- * Module for handling data persistence using localStorage
+ * Storage Module
+ * Handles saving and loading application state from localStorage
  */
 
-/**
- * Storage keys
- * @enum {string}
- */
-const StorageKeys = {
-  TASKS: 'focusTodo.tasks',
-  PROJECTS: 'focusTodo.projects',
-  TIMER_SETTINGS: 'focusTodo.timerSettings',
-  DAILY_STATS: 'focusTodo.dailyStats',
-  HISTORY: 'focusTodo.history',
-  APP_SETTINGS: 'focusTodo.appSettings'
+// The key used for storing app state in localStorage
+const STORAGE_KEY = 'focus-todo-app-state';
+
+// Default app state
+const DEFAULT_STATE = {
+    tasks: [],
+    timerState: {
+        currentMode: 'pomodoro',
+        timeRemaining: 25 * 60,
+        isRunning: false,
+        currentTask: null,
+        completedPomodoros: 0
+    },
+    progressData: {
+        totalTasks: 0,
+        completedTasks: 0,
+        totalPomodoros: 0,
+        completedPomodoros: 0,
+        estimatedTime: 0,
+        elapsedTime: 0
+    }
 };
 
+// Current app state
+let appState = { ...DEFAULT_STATE };
+
 /**
- * StorageManager class for handling data persistence
+ * Load the application state from localStorage
+ * @returns {Object} The loaded application state
  */
-class StorageManager {
-  /**
-   * Saves data to localStorage
-   * @param {string} key - Storage key
-   * @param {*} data - Data to store (will be JSON stringified)
-   * @returns {boolean} True if saved successfully
-   */
-  static save(key, data) {
+export function loadState() {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
-      return true;
+        const savedState = localStorage.getItem(STORAGE_KEY);
+        
+        if (savedState) {
+            // Parse the saved state
+            const parsedState = JSON.parse(savedState);
+            
+            // Merge with default state to handle any missing properties
+            appState = { ...DEFAULT_STATE, ...parsedState };
+            
+            console.log('State loaded from localStorage');
+        } else {
+            console.log('No saved state found, using default state');
+            appState = { ...DEFAULT_STATE };
+        }
     } catch (error) {
-      console.error('Error saving to localStorage', error);
-      return false;
+        console.error('Error loading state from localStorage:', error);
+        appState = { ...DEFAULT_STATE };
     }
-  }
-
-  /**
-   * Loads data from localStorage
-   * @param {string} key - Storage key
-   * @param {*} defaultValue - Default value if key not found
-   * @returns {*} Parsed data or default value
-   */
-  static load(key, defaultValue = null) {
-    try {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : defaultValue;
-    } catch (error) {
-      console.error('Error loading from localStorage', error);
-      return defaultValue;
-    }
-  }
-
-  /**
-   * Removes data from localStorage
-   * @param {string} key - Storage key
-   * @returns {boolean} True if removed successfully
-   */
-  static remove(key) {
-    try {
-      localStorage.removeItem(key);
-      return true;
-    } catch (error) {
-      console.error('Error removing from localStorage', error);
-      return false;
-    }
-  }
-
-  /**
-   * Saves tasks to localStorage
-   * @param {Array} tasks - Array of tasks
-   * @returns {boolean} True if saved successfully
-   */
-  static saveTasks(tasks) {
-    return this.save(StorageKeys.TASKS, tasks);
-  }
-
-  /**
-   * Loads tasks from localStorage
-   * @returns {Array} Array of tasks
-   */
-  static loadTasks() {
-    return this.load(StorageKeys.TASKS, []);
-  }
-
-  /**
-   * Saves projects to localStorage
-   * @param {Array} projects - Array of projects
-   * @returns {boolean} True if saved successfully
-   */
-  static saveProjects(projects) {
-    return this.save(StorageKeys.PROJECTS, projects);
-  }
-
-  /**
-   * Loads projects from localStorage
-   * @returns {Array} Array of projects
-   */
-  static loadProjects() {
-    return this.load(StorageKeys.PROJECTS, []);
-  }
-
-  /**
-   * Saves timer settings to localStorage
-   * @param {Object} settings - Timer settings object
-   * @returns {boolean} True if saved successfully
-   */
-  static saveTimerSettings(settings) {
-    return this.save(StorageKeys.TIMER_SETTINGS, settings);
-  }
-
-  /**
-   * Loads timer settings from localStorage
-   * @param {Object} defaultSettings - Default timer settings
-   * @returns {Object} Timer settings
-   */
-  static loadTimerSettings(defaultSettings) {
-    return this.load(StorageKeys.TIMER_SETTINGS, defaultSettings);
-  }
-
-  /**
-   * Saves daily statistics to localStorage
-   * @param {Object} stats - Daily statistics object
-   * @returns {boolean} True if saved successfully
-   */
-  static saveDailyStats(stats) {
-    return this.save(StorageKeys.DAILY_STATS, stats);
-  }
-
-  /**
-   * Loads daily statistics from localStorage
-   * @param {Object} defaultStats - Default daily statistics
-   * @returns {Object} Daily statistics
-   */
-  static loadDailyStats(defaultStats) {
-    return this.load(StorageKeys.DAILY_STATS, defaultStats);
-  }
-
-  /**
-   * Saves historical statistics to localStorage
-   * @param {Object} history - Historical statistics object
-   * @returns {boolean} True if saved successfully
-   */
-  static saveHistory(history) {
-    return this.save(StorageKeys.HISTORY, history);
-  }
-
-  /**
-   * Loads historical statistics from localStorage
-   * @returns {Object} Historical statistics
-   */
-  static loadHistory() {
-    return this.load(StorageKeys.HISTORY, {});
-  }
-
-  /**
-   * Saves app settings to localStorage
-   * @param {Object} settings - App settings object
-   * @returns {boolean} True if saved successfully
-   */
-  static saveAppSettings(settings) {
-    return this.save(StorageKeys.APP_SETTINGS, settings);
-  }
-
-  /**
-   * Loads app settings from localStorage
-   * @param {Object} defaultSettings - Default app settings
-   * @returns {Object} App settings
-   */
-  static loadAppSettings(defaultSettings) {
-    return this.load(StorageKeys.APP_SETTINGS, defaultSettings);
-  }
-
-  /**
-   * Exports all data as a JSON file for backup
-   * @returns {Object} All stored data
-   */
-  static exportData() {
-    return {
-      tasks: this.loadTasks(),
-      projects: this.loadProjects(),
-      timerSettings: this.load(StorageKeys.TIMER_SETTINGS),
-      dailyStats: this.load(StorageKeys.DAILY_STATS),
-      history: this.loadHistory(),
-      appSettings: this.load(StorageKeys.APP_SETTINGS)
-    };
-  }
-
-  /**
-   * Imports data from a backup JSON
-   * @param {Object} data - Data to import
-   * @returns {boolean} True if imported successfully
-   */
-  static importData(data) {
-    try {
-      // Validate data structure
-      if (!data || typeof data !== 'object') {
-        throw new Error('Invalid data format');
-      }
-      
-      // Import each data type
-      if (Array.isArray(data.tasks)) {
-        this.saveTasks(data.tasks);
-      }
-      
-      if (Array.isArray(data.projects)) {
-        this.saveProjects(data.projects);
-      }
-      
-      if (data.timerSettings && typeof data.timerSettings === 'object') {
-        this.saveTimerSettings(data.timerSettings);
-      }
-      
-      if (data.dailyStats && typeof data.dailyStats === 'object') {
-        this.saveDailyStats(data.dailyStats);
-      }
-      
-      if (data.history && typeof data.history === 'object') {
-        this.saveHistory(data.history);
-      }
-      
-      if (data.appSettings && typeof data.appSettings === 'object') {
-        this.saveAppSettings(data.appSettings);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error importing data', error);
-      return false;
-    }
-  }
-
-  /**
-   * Clears all stored data
-   * @returns {boolean} True if cleared successfully
-   */
-  static clearAllData() {
-    try {
-      Object.values(StorageKeys).forEach(key => {
-        this.remove(key);
-      });
-      return true;
-    } catch (error) {
-      console.error('Error clearing data', error);
-      return false;
-    }
-  }
+    
+    return appState;
 }
 
-export { StorageManager, StorageKeys };
+/**
+ * Save the application state to localStorage
+ * @param {Object} stateChanges - The state changes to save
+ */
+export function saveState(stateChanges = {}) {
+    try {
+        // Update the app state with the changes
+        appState = { ...appState, ...stateChanges };
+        
+        // Save to localStorage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        
+        console.log('State saved to localStorage');
+    } catch (error) {
+        console.error('Error saving state to localStorage:', error);
+    }
+}
+
+/**
+ * Get the current application state
+ * @returns {Object} The current application state
+ */
+export function getState() {
+    return { ...appState };
+}
+
+/**
+ * Clear all saved state and reset to defaults
+ */
+export function clearState() {
+    try {
+        localStorage.removeItem(STORAGE_KEY);
+        appState = { ...DEFAULT_STATE };
+        console.log('State cleared from localStorage');
+    } catch (error) {
+        console.error('Error clearing state from localStorage:', error);
+    }
+}
