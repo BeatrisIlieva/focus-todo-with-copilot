@@ -1,6 +1,6 @@
 // Main application entry point
-import { initTaskManagement } from './tasks.js';
-import { initPomodoroTimer } from './timer.js';
+import { initTaskManagement, getTasks, getSelectedTaskId } from './tasks.js';
+import { initPomodoroTimer, setTasks, setSelectedTaskId } from './timer.js';
 import { initProgressTracking } from './progress.js';
 import { loadState } from './storage.js';
 
@@ -9,15 +9,41 @@ import { loadState } from './storage.js';
  */
 function initApp() {
     // Load saved state from localStorage
-    loadState();
+    const state = loadState();
     
-    // Initialize all modules
+    // Initialize all modules in proper order
     initTaskManagement();
     initPomodoroTimer();
     initProgressTracking();
     
+    // Connect modules
+    connectModules();
+    
     // Set up event listeners for UI controls
     setupUIControls();
+    
+    // Request notification permission
+    requestNotificationPermission();
+}
+
+/**
+ * Connect the different modules together
+ */
+function connectModules() {
+    // Share tasks data with timer module
+    setTasks(getTasks());
+    
+    // Share selected task ID with timer module
+    setSelectedTaskId(getSelectedTaskId());
+}
+
+/**
+ * Request permission for browser notifications
+ */
+function requestNotificationPermission() {
+    if ('Notification' in window) {
+        Notification.requestPermission();
+    }
 }
 
 /**

@@ -74,7 +74,7 @@ function updateProgressUI() {
         
         switch (statLabel) {
             case 'Tasks to be Completed':
-                statValue.textContent = progressData.totalTasks;
+                statValue.textContent = progressData.totalTasks - progressData.completedTasks;
                 break;
             case 'Completed Tasks':
                 statValue.textContent = progressData.completedTasks;
@@ -90,4 +90,55 @@ function updateProgressUI() {
                 break;
         }
     });
+    
+    // Update progress bar
+    const percentComplete = Math.round((progressData.completedTasks / progressData.totalTasks) * 100) || 0;
+    updateProgressBar(percentComplete);
+}
+
+/**
+ * Add a visual progress bar to the UI if it doesn't exist
+ */
+function addProgressBar() {
+    if (!document.querySelector('.progress-bar-container')) {
+        const statsSection = document.querySelector('.task-statistics');
+        
+        const progressBarContainer = document.createElement('div');
+        progressBarContainer.classList.add('progress-bar-container');
+        progressBarContainer.innerHTML = `
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-text">0%</div>
+        `;
+        
+        statsSection.after(progressBarContainer);
+    }
+}
+
+/**
+ * Update the progress bar in the UI
+ * @param {number} percent - The percentage to display
+ */
+function updateProgressBar(percent) {
+    // Make sure progress bar exists
+    addProgressBar();
+    
+    // Update the bar
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+    
+    if (progressFill && progressText) {
+        progressFill.style.width = `${percent}%`;
+        progressText.textContent = `${percent}%`;
+        
+        // Change color based on progress
+        if (percent < 30) {
+            progressFill.style.backgroundColor = '#ff5c5c';
+        } else if (percent < 70) {
+            progressFill.style.backgroundColor = '#ffca40';
+        } else {
+            progressFill.style.backgroundColor = '#5fd86e';
+        }
+    }
 }
