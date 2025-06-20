@@ -33,6 +33,8 @@ focus-todo-with-copilot/
 
 This project uses vanilla JavaScript with a focus on modular design and best practices.
 
+> **Note**: This project was built using GitHub Copilot in agentic mode, demonstrating the capabilities of AI assistance in software development.
+
 ## License
 
 MIT
