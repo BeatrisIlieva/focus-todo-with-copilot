@@ -101,6 +101,7 @@ A progress bar that shows the progress
 </features>
 
 <project_setup>
+You should wait a confirmation before proceeding to the next step.
 <task>Create project folder structure:
 <folder>/src (source code)
 <subfolder>/js (JavaScript modules)</subfolder>
