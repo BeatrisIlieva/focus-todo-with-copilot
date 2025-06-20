@@ -11,7 +11,7 @@ const DEFAULT_STATE = {
     tasks: [],
     timerState: {
         currentMode: 'pomodoro',
-        timeRemaining: 30, // 30 seconds for testing (normally 25 * 60)
+        timeRemaining: 25 * 60,
         isRunning: false,
         currentTask: null,
         completedPomodoros: 0

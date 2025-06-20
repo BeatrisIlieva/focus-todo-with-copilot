@@ -7,10 +7,10 @@ import { saveState } from './storage.js';
 
 // Default timer settings
 const DEFAULT_SETTINGS = {
-    pomodoro: 30, // 30 seconds for testing (normally 25 * 60 for 25 minutes)
-    shortBreak: 10, // 10 seconds for testing (normally 5 * 60 for 5 minutes)
-    longBreak: 15, // 15 seconds for testing (normally 15 * 60 for 15 minutes)
-    longBreakInterval: 2, // After 2 pomodoros, take a long break (for easier testing)
+    pomodoro: 25 * 60, // 25 minutes in seconds
+    shortBreak: 5 * 60, // 5 minutes in seconds
+    longBreak: 15 * 60, // 15 minutes in seconds
+    longBreakInterval: 4, // After 4 pomodoros, take a long break
 };
 
 // Timer state
@@ -301,7 +301,7 @@ function startPomodoro(taskId) {
     timerState.timeRemaining = DEFAULT_SETTINGS.pomodoro;
     
     // Update the timer display
-    document.querySelector('.timer-display').textContent = '00:30'; // 30 seconds for testing
+    document.querySelector('.timer-display').textContent = '25:00';
     document.querySelector('.pomodoro-timer h3').textContent = task.name;
     
     // Show the timer modal

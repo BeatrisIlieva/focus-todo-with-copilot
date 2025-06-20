@@ -44,7 +44,7 @@ export function updateProgress(tasks) {
     
     // Calculate time statistics (in minutes)
     let estimatedTime = tasks.reduce((total, task) => total + (task.estimatedTime || 0), 0);
-    let elapsedTime = completedPomodoros * 0.5; // Using 0.5 minutes (30 seconds) per pomodoro for testing
+    let elapsedTime = completedPomodoros * 25; // Assuming 25 minutes per pomodoro
     
     // Update the progress data
     progressData = {
