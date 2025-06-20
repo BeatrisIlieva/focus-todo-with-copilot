@@ -3,12 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Focus To-Do: A task management application with Pomodoro timer">
     <title>Focus To-Do</title>
     <link rel="stylesheet" href="src/css/style.css">
     <link rel="icon" href="src/assets/favicon.ico" type="image/x-icon">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Main app container will be added in the next step -->
+    <div class="app-container" id="app">
+        <!-- Application header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="menu-toggle" aria-label="Toggle menu" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="app-title">Focus To-Do</h1>
+            </div>
+            <div class="header-right">
+                <button class="header-button" aria-label="Search tasks" id="searchButton">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="header-button" aria-label="Show statistics" id="statsButton">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+                <button class="header-button" aria-label="Show settings" id="settingsButton">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main content area with sidebar and task area -->
+        <main class="app-main">
+            <!-- Sidebar for navigation and filters -->
+            <aside class="sidebar" id="sidebar">
+                <!-- User profile section -->
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>User</span>
+                    </div>
+                    <div class="user-name">
+                        <span>User Name</span>
+                    </div>
+                </div>
+                
+                <!-- Navigation lists -->
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item active">
+                            <button class="nav-button" aria-label="Today's tasks">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>Today</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-button" aria-label="Tomorrow's tasks">
+                                <i class="fas fa-calendar"></i>
+                                <span>Tomorrow</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-button" aria-label="This week's tasks">
+                                <i class="fas fa-calendar-week"></i>
+                                <span>This Week</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-button" aria-label="High priority tasks">
+                                <i class="fas fa-flag"></i>
+                                <span>High Priority</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-button" aria-label="Planned tasks">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span>Planned</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-button" aria-label="All tasks">
+                                <i class="fas fa-tasks"></i>
+                                <span>All</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-button" aria-label="Completed tasks">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Completed</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                    </ul>
+                    
+                    <h2 class="list-title">Projects</h2>
+                    <ul class="project-list" id="projectList">
+                        <!-- Project items will be populated dynamically -->
+                        <li class="project-item">
+                            <button class="project-button" aria-label="Work project">
+                                <i class="fas fa-circle" style="color: #4a90e2;"></i>
+                                <span>Work</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="project-item">
+                            <button class="project-button" aria-label="Study project">
+                                <i class="fas fa-circle" style="color: #50e3c2;"></i>
+                                <span>Study</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                        <li class="project-item">
+                            <button class="project-button" aria-label="Personal project">
+                                <i class="fas fa-circle" style="color: #e86c60;"></i>
+                                <span>Personal</span>
+                            </button>
+                            <span class="task-count">0</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="add-project-btn" id="addProjectBtn" aria-label="Add new project">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Project</span>
+                    </button>
+                </nav>
+            </aside>
+            
+            <!-- Main task area -->
+            <section class="task-area">
+                <!-- Task area header -->
+                <div class="task-area-header">
+                    <h2 class="view-title">Today</h2>
+                    <div class="header-actions">
+                        <button class="view-button" aria-label="List view" id="listView">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button class="view-button" aria-label="Calendar view" id="calendarView">
+                            <i class="fas fa-calendar-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pomodoro timer section -->
+                <section class="pomodoro-container" id="pomodoro">
+                    <div class="pomodoro-timer">
+                        <div class="timer-display">
+                            <span class="timer-minutes">25</span>
+                            <span class="timer-divider">:</span>
+                            <span class="timer-seconds">00</span>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="timer-button" id="timerStart" aria-label="Start timer">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="timer-button" id="timerPause" aria-label="Pause timer" disabled>
+                                <i class="fas fa-pause"></i>
+                            </button>
+                            <button class="timer-button" id="timerReset" aria-label="Reset timer">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                            <button class="timer-button" id="timerSettings" aria-label="Timer settings">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="pomodoro-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Planned</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Focus time (min)</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress tracking bar -->
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 0%;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </section>
+                
+                <!-- Task list section -->
+                <section class="task-list-container">
+                    <ul class="task-list" id="taskList">
+                        <!-- Task items will be populated dynamically -->
+                    </ul>
+                    
+                    <!-- Add task input -->
+                    <div class="add-task-container">
+                        <button class="add-task-toggle" id="addTaskToggle" aria-label="Add task">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <input type="text" class="add-task-input" id="addTaskInput" placeholder="Add a task to 'Today', press Enter" aria-label="Add a task">
+                    </div>
+                </section>
+            </section>
+        </main>
+        
+        <!-- Task Detail Panel (initially hidden) -->
+        <aside class="task-detail-panel" id="taskDetail" hidden>
+            <div class="detail-header">
+                <h3>Task Details</h3>
+                <button class="close-detail" id="closeDetail" aria-label="Close details panel">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="detail-content">
+                <!-- Task detail content will be populated dynamically -->
+            </div>
+        </aside>
+        
+        <!-- Modals/popups (initially hidden) -->
+        <div class="modal-overlay" id="modalOverlay" hidden>
+            <!-- Task edit modal -->
+            <div class="modal task-edit-modal" id="taskEditModal" aria-labelledby="modalTitle" aria-describedby="modalDescription" role="dialog" hidden>
+                <header class="modal-header">
+                    <h3 id="modalTitle">Edit Task</h3>
+                    <button class="modal-close" id="closeModal" aria-label="Close modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </header>
+                <div class="modal-content" id="modalDescription">
+                    <form id="taskEditForm">
+                        <div class="form-group">
+                            <label for="taskName">Task Name</label>
+                            <input type="text" id="taskName" name="taskName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskProject">Project</label>
+                            <select id="taskProject" name="taskProject">
+                                <option value="none">None</option>
+                                <!-- Project options will be populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPriority">Priority</label>
+                            <div class="priority-options">
+                                <button type="button" class="priority-option" data-priority="1">
+                                    <i class="fas fa-flag" style="color: #e74c3c;"></i>
+                                </button>
+                                <button type="button" class="priority-option" data-priority="2">
+                                    <i class="fas fa-flag" style="color: #f39c12;"></i>
+                                </button>
+                                <button type="button" class="priority-option" data-priority="3">
+                                    <i class="fas fa-flag" style="color: #3498db;"></i>
+                                </button>
+                                <button type="button" class="priority-option" data-priority="4">
+                                    <i class="fas fa-flag" style="color: #95a5a6;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDueDate">Due Date</label>
+                            <input type="date" id="taskDueDate" name="taskDueDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPomodoros">Estimated Pomodoros</label>
+                            <input type="number" id="taskPomodoros" name="taskPomodoros" min="1" max="10" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskNotes">Notes</label>
+                            <textarea id="taskNotes" name="taskNotes" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="subtaskList">Subtasks</label>
+                            <ul class="subtask-list" id="subtaskList">
+                                <!-- Subtasks will be populated dynamically -->
+                            </ul>
+                            <div class="add-subtask-container">
+                                <input type="text" id="newSubtask" placeholder="Add a subtask">
+                                <button type="button" id="addSubtask" aria-label="Add subtask">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Save</button>
+                            <button type="button" class="btn-secondary" id="cancelEditTask">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Timer settings modal -->
+            <div class="modal timer-settings-modal" id="timerSettingsModal" aria-labelledby="timerModalTitle" aria-describedby="timerModalDescription" role="dialog" hidden>
+                <header class="modal-header">
+                    <h3 id="timerModalTitle">Timer Settings</h3>
+                    <button class="modal-close" id="closeTimerModal" aria-label="Close timer settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </header>
+                <div class="modal-content" id="timerModalDescription">
+                    <form id="timerSettingsForm">
+                        <div class="form-group">
+                            <label for="focusDuration">Focus Duration (minutes)</label>
+                            <input type="number" id="focusDuration" name="focusDuration" min="1" max="60" value="25">
+                        </div>
+                        <div class="form-group">
+                            <label for="shortBreakDuration">Short Break (minutes)</label>
+                            <input type="number" id="shortBreakDuration" name="shortBreakDuration" min="1" max="30" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="longBreakDuration">Long Break (minutes)</label>
+                            <input type="number" id="longBreakDuration" name="longBreakDuration" min="1" max="60" value="15">
+                        </div>
+                        <div class="form-group">
+                            <label for="longBreakInterval">Long Break After (pomodoros)</label>
+                            <input type="number" id="longBreakInterval" name="longBreakInterval" min="1" max="10" value="4">
+                        </div>
+                        <div class="form-group">
+                            <label for="autoStartBreaks">Auto Start Breaks</label>
+                            <input type="checkbox" id="autoStartBreaks" name="autoStartBreaks">
+                        </div>
+                        <div class="form-group">
+                            <label for="autoStartPomodoros">Auto Start Pomodoros</label>
+                            <input type="checkbox" id="autoStartPomodoros" name="autoStartPomodoros">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Save</button>
+                            <button type="button" class="btn-secondary" id="cancelTimerSettings">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main JavaScript module -->
     <script src="src/js/main.js" type="module"></script>
 </body>
 </html>
